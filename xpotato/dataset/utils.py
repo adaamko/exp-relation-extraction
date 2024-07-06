@@ -1,4 +1,5 @@
 import json
+import re
 from collections import defaultdict
 
 import networkx as nx
@@ -43,8 +44,10 @@ def default_pn_to_graph(raw_dl, edge_attr="color"):
     G = nx.DiGraph()
 
     char_to_id = defaultdict(int)
+    char_to_entity = dict()
     next_id = 0
     for i, trip in enumerate(g.triples):
+        #print(f"Potato: {trip}")
         if i == 0:
             root_id = next_id
             name = trip[2]
@@ -53,6 +56,9 @@ def default_pn_to_graph(raw_dl, edge_attr="color"):
             G.add_node(root_id, name=name)
             char_to_id[trip[0]] = next_id
             next_id += 1
+
+        elif re.match("entity", trip[0].split('_')[0]):
+            char_to_entity[trip[0]] = trip[2]
 
         elif trip[1] == ":instance":
             if trip[2]:
@@ -64,7 +70,9 @@ def default_pn_to_graph(raw_dl, edge_attr="color"):
                 next_id += 1
 
     for trip in g.triples:
-        if trip[1] != ":instance":
+        if re.match(r":entity", trip[1]):
+            G.nodes[char_to_id[trip[0]]]["entity"] = int(char_to_entity[trip[2]])
+        elif trip[1] != ":instance":
             edge = trip[1].split(":")[1]
             src = trip[0]
             tgt = trip[2]
