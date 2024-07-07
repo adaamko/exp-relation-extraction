@@ -11,7 +11,6 @@ from tuw_nlp.graph.utils import GraphFormulaPatternMatcher
 
 from xpotato.dataset.utils import amr_pn_to_graph, default_pn_to_graph, ud_to_graph
 
-
 class GraphExtractor:
     def __init__(self, cache_dir=None, cache_fn=None, lang=None):
         if cache_dir is None:
